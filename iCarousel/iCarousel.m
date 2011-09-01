@@ -789,14 +789,14 @@ NSInteger compareViewDepth(id obj1, id obj2, void *context)
 	{
 		return;
 	}
-
+    
 	//remove old views
     for (UIView *view in self.visibleItemViews)
     {
 		[view.superview removeFromSuperview];
 	}
 	self.itemViews = [NSMutableDictionary dictionary];
-   
+    
     //get number of items and placeholders
     numberOfItems = [dataSource numberOfItemsInCarousel:self];
     if ([dataSource respondsToSelector:@selector(numberOfPlaceholdersInCarousel:)])
@@ -1141,13 +1141,13 @@ NSInteger compareViewDepth(id obj1, id obj2, void *context)
 - (BOOL)shouldDecelerate
 {
     return (fabsf(startVelocity) > itemWidth * SCROLL_SPEED_THRESHOLD) &&
-		(fabsf([self decelerationDistance]) > itemWidth * DECELERATE_THRESHOLD);
+    (fabsf([self decelerationDistance]) > itemWidth * DECELERATE_THRESHOLD);
 }
 
 - (BOOL)shouldScroll
 {
     return (fabsf(startVelocity) > itemWidth * SCROLL_SPEED_THRESHOLD) &&
-        (fabsf(scrollOffset/itemWidth - self.currentItemIndex) > SCROLL_DISTANCE_THRESHOLD);
+    (fabsf(scrollOffset/itemWidth - self.currentItemIndex) > SCROLL_DISTANCE_THRESHOLD);
 }
 
 - (void)startDecelerating
@@ -1171,7 +1171,7 @@ NSInteger compareViewDepth(id obj1, id obj2, void *context)
         if (bounces)
         {
             endOffset = fmaxf(itemWidth * -bounceDistance,
-                fminf((numberOfItems - 1.0f + bounceDistance) * itemWidth, endOffset));
+                              fminf((numberOfItems - 1.0f + bounceDistance) * itemWidth, endOffset));
         }
         else
         {
@@ -1412,7 +1412,7 @@ NSInteger compareViewDepth(id obj1, id obj2, void *context)
 - (void)didTap:(UITapGestureRecognizer *)tapGesture
 {
     NSInteger index = [self indexOfView:[tapGesture.view.subviews objectAtIndex:0]];
-    if (centerItemWhenSelected && index != self.currentItemIndex)
+    if (centerItemWhenSelected && index != self.currentItemIndex && !decelerating)
     {
         [self scrollToItemAtIndex:index animated:YES];
     }
@@ -1528,7 +1528,7 @@ NSInteger compareViewDepth(id obj1, id obj2, void *context)
 		{
 			factor = 1.0f - fminf(fabsf(scrollOffset - [self clampedOffset:scrollOffset]) / itemWidth, bounceDistance) / bounceDistance;
 		}
-     
+        
         NSTimeInterval thisTime = [theEvent timestamp];
         startVelocity = -(translation / (thisTime - startTime)) * factor * scrollSpeed;
         startTime = thisTime;

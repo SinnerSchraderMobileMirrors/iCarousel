@@ -1419,14 +1419,19 @@ NSInteger compareViewDepth(id obj1, id obj2, void *context)
 
 - (void)didTap:(UITapGestureRecognizer *)tapGesture
 {
-    NSInteger index = [self indexOfView:[tapGesture.view.subviews objectAtIndex:0]];
-    if (centerItemWhenSelected && index != self.currentItemIndex && !decelerating)
-    {
-        [self scrollToItemAtIndex:index animated:YES];
-    }
-    if ([delegate respondsToSelector:@selector(carousel:didSelectItemAtIndex:)])
-    {
-        [delegate carousel:self didSelectItemAtIndex:index];
+    
+    NSArray* subviews = tapGesture.view.subviews;
+    if (subviews != nil && [subviews count] > 0) {
+        NSInteger index = [self indexOfView:[subviews objectAtIndex:0]];
+        if (centerItemWhenSelected && index != self.currentItemIndex && !decelerating)
+        {
+            [self scrollToItemAtIndex:index animated:YES];
+        }
+        if ([delegate respondsToSelector:@selector(carousel:didSelectItemAtIndex:)])
+        {
+            [delegate carousel:self didSelectItemAtIndex:index];
+        }
+
     }
 }
 

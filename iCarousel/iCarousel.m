@@ -66,6 +66,7 @@
 @property (nonatomic, assign) BOOL dragging;
 @property (nonatomic, assign) BOOL didDrag;
 @property (nonatomic, assign) NSTimeInterval toggleTime;
+@property (nonatomic, readwrite, retain) NSMutableSet* reuseableViews;
 
 - (void)didMoveToSuperview;
 - (void)layOutItemViews;
@@ -119,6 +120,7 @@
 @synthesize toggle;
 @synthesize stopAtItemBoundary;
 @synthesize scrollToItemBoundary;
+@synthesize reuseableViews;
 
 #ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
 
@@ -148,6 +150,8 @@
     scrollToItemBoundary = YES;
     
     contentView = [[UIView alloc] initWithFrame:self.bounds];
+    
+    self.reuseableViews = [NSMutableSet set];
     
 #ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
     
@@ -738,6 +742,10 @@ NSInteger compareViewDepth(id obj1, id obj2, void *context)
     return [self loadViewAtIndex:index withContainerView:nil];
 }
 
+- (void)removeAndRecycleView:(UIView *)view  {
+    [self.reuseableViews addObject:view];
+    [view removeFromSuperview];
+}
 - (void)loadUnloadViews
 {
     //calculate visible view indices
@@ -766,8 +774,8 @@ NSInteger compareViewDepth(id obj1, id obj2, void *context)
         if (![visibleIndices containsObject:number])
         {
             UIView *view = [itemViews objectForKey:number];
-            [view.superview removeFromSuperview];
             [(NSMutableDictionary *)itemViews removeObjectForKey:number];
+            [self removeAndRecycleView:view];
         }
     }
     
@@ -793,7 +801,7 @@ NSInteger compareViewDepth(id obj1, id obj2, void *context)
 	//remove old views
     for (UIView *view in self.visibleItemViews)
     {
-		[view.superview removeFromSuperview];
+        [self removeAndRecycleView:view];
 	}
 	self.itemViews = [NSMutableDictionary dictionary];
     
